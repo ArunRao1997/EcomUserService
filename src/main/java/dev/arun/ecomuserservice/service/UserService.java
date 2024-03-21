@@ -1,5 +1,6 @@
 package dev.arun.ecomuserservice.service;
 
+import dev.arun.ecomuserservice.dto.UserDto;
 import dev.arun.ecomuserservice.models.Role;
 import dev.arun.ecomuserservice.models.User;
 import dev.arun.ecomuserservice.repository.RoleRepository;

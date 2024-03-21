@@ -1,11 +1,17 @@
 package dev.arun.ecomuserservice.service;
 
+import dev.arun.ecomuserservice.dto.UserDto;
+import dev.arun.ecomuserservice.exception.InvalidCredentialException;
+import dev.arun.ecomuserservice.exception.InvalidTokenException;
+import dev.arun.ecomuserservice.exception.UserNotFoundException;
+import dev.arun.ecomuserservice.mapper.UserEntityDTOMapper;
 import dev.arun.ecomuserservice.models.Session;
 import dev.arun.ecomuserservice.models.SessionStatus;
 import dev.arun.ecomuserservice.models.User;
 import dev.arun.ecomuserservice.repository.SessionRepository;
 import dev.arun.ecomuserservice.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.MacAlgorithm;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +21,7 @@ import org.springframework.util.MultiValueMapAdapter;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AuthService {
@@ -31,6 +34,15 @@ public class AuthService {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    public ResponseEntity<List<Session>> getAllSession(){
+        List<Session> sessions = sessionRepository.findAll();
+        return ResponseEntity.ok(sessions);
+    }
+
+    public ResponseEntity<List<User>> getAllUsers(){
+        return ResponseEntity.ok(userRepository.findAll());
     }
 
     public ResponseEntity<UserDto> login(String email, String password) {
