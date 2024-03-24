@@ -2,6 +2,7 @@ package dev.arun.ecomuserservice.service;//package dev.arun.ecomuserservice.serv
 
 import dev.arun.ecomuserservice.dto.UserDto;
 import dev.arun.ecomuserservice.exception.InvalidCredentialException;
+import dev.arun.ecomuserservice.exception.InvalidSessionException;
 import dev.arun.ecomuserservice.exception.InvalidTokenException;
 import dev.arun.ecomuserservice.exception.UserNotFoundException;
 import dev.arun.ecomuserservice.mapper.UserEntityDTOMapper;
@@ -10,7 +11,7 @@ import dev.arun.ecomuserservice.models.SessionStatus;
 import dev.arun.ecomuserservice.models.User;
 import dev.arun.ecomuserservice.repository.SessionRepository;
 import dev.arun.ecomuserservice.repository.UserRepository;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.MacAlgorithm;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,7 @@ public class AuthService {
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    //private SecretKey secretKey;
 
     public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
@@ -52,21 +54,19 @@ public class AuthService {
             throw new UserNotFoundException("User for the given email id does not exist");
         }
         User user = userOptional.get();
-        if(!user.getPassword().equals(password)){
-            return null;
-        }
         //Verify the user password given at the time of login
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialException("Invalid Credentials");
         }
         //token generation
-       // String token = RandomStringUtils.randomAlphanumeric(30);
+      //  String token = RandomStringUtils.randomAlphanumeric(30);
         MacAlgorithm alg = Jwts.SIG.HS256; // HS256 algo added for JWT
         SecretKey key = alg.key().build(); // generating the secret key
 
         //start adding the claims
         Map<String, Object> jsonForJWT = new HashMap<>();
         jsonForJWT.put("userId", user.getId());
+        jsonForJWT.put("email", user.getEmail());
         jsonForJWT.put("roles", user.getRoles());
         jsonForJWT.put("createdAt", new Date());
         jsonForJWT.put("expiryAt", new Date(LocalDate.now().plusDays(3).toEpochDay()));
@@ -96,7 +96,7 @@ public class AuthService {
         // validations -> token exists, token is not expired, user exists else throw an exception
         Optional<Session> sessionOptional = sessionRepository.findByTokenAndUser_Id(token, userId);
         if (sessionOptional.isEmpty()) {
-            return null; //TODO throw exception here
+            throw new InvalidSessionException("Session not found");
         }
         Session session = sessionOptional.get();
         session.setSessionStatus(SessionStatus.ENDED);
@@ -107,7 +107,7 @@ public class AuthService {
     public UserDto signUp(String email, String password) {
         User user = new User();
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
 
         User savedUser = userRepository.save(user);
 
@@ -116,7 +116,23 @@ public class AuthService {
 
     public SessionStatus validate(String token, Long userId) {
         //TODO check expiry // Jwts Parser -> parse the encoded JWT token to read the claims
-
+//        try {
+//            JwtParser parser = (JwtParser) Jwts.parser()
+//                    .setSigningKey(secretKey);
+//
+//            Claims claims = parser.parseClaimsJws(token).getBody();
+//            claims.get("userId", String.class);
+//
+//            Date expirationDate = claims.getExpiration();
+//            if (expirationDate.before(new Date())) {
+//                throw new InvalidTokenException("Token has expired");
+//            }
+//
+//        } catch (ExpiredJwtException e) {
+//            throw new InvalidTokenException("Token has expired");
+//        } catch (JwtException e) { // Covers broader issues like malformed JWT
+//            throw new InvalidTokenException("Token is invalid");
+//        }
         //verifying from DB if session exists
         Optional<Session> sessionOptional = sessionRepository.findByTokenAndUser_Id(token, userId);
         if (sessionOptional.isEmpty() || sessionOptional.get().getSessionStatus().equals(SessionStatus.ENDED)) {

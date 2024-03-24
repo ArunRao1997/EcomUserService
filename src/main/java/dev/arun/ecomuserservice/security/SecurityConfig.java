@@ -74,7 +74,7 @@
 //    }
 //
 ////    @Bean
-////    public RegisteredClientRepository registeredClientRepository() {
+////    public JRegisteredClientRepository registeredClientRepository() {
 ////        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
 ////                .clientId("productservice")
 ////                .clientSecret(bCryptPasswordEncoder.encode("passwordofproductserviceclient")) // this password can be anything, its basically how the client will identify itself
