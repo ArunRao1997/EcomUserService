@@ -21,19 +21,21 @@ public class UserService {
         this.roleRepository = roleRepository;
     }
 
-    public UserDto getUserDetails(Long userId){
-      Optional<User> userOptional = userRepository.findById(userId);
-      if(userOptional.isEmpty()){
-          return null;
-      }
-      return UserDto.from(userOptional.get());
+    public UserDto getUserDetails(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            return null;
+        }
+
+        return UserDto.from(userOptional.get());
     }
 
-    public UserDto setUserRoles(Long userId, List<Long> roleIds){
+    public UserDto setUserRoles(Long userId, List<Long> roleIds) {
         Optional<User> userOptional = userRepository.findById(userId);
-        Set<Role> roles =  roleRepository.findAllByIdIn(roleIds);
+        Set<Role> roles = roleRepository.findAllByIdIn(roleIds);
 
-        if(userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             return null;
         }
 
@@ -41,6 +43,7 @@ public class UserService {
         user.setRoles(roles);
 
         User savedUser = userRepository.save(user);
+
         return UserDto.from(savedUser);
     }
 }

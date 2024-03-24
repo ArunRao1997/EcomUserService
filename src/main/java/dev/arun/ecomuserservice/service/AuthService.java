@@ -1,4 +1,4 @@
-package dev.arun.ecomuserservice.service;
+package dev.arun.ecomuserservice.service;//package dev.arun.ecomuserservice.service;
 
 import dev.arun.ecomuserservice.dto.UserDto;
 import dev.arun.ecomuserservice.exception.InvalidCredentialException;
@@ -12,6 +12,7 @@ import dev.arun.ecomuserservice.repository.SessionRepository;
 import dev.arun.ecomuserservice.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.MacAlgorithm;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,6 @@ import java.util.*;
 public class AuthService {
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
-
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -36,12 +36,12 @@ public class AuthService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public ResponseEntity<List<Session>> getAllSession(){
+    public ResponseEntity<List<Session>> getAllSession() {
         List<Session> sessions = sessionRepository.findAll();
         return ResponseEntity.ok(sessions);
     }
 
-    public ResponseEntity<List<User>> getAllUsers(){
+    public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
@@ -52,12 +52,15 @@ public class AuthService {
             throw new UserNotFoundException("User for the given email id does not exist");
         }
         User user = userOptional.get();
+        if(!user.getPassword().equals(password)){
+            return null;
+        }
         //Verify the user password given at the time of login
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialException("Invalid Credentials");
         }
         //token generation
-        //String token = RandomStringUtils.randomAlphanumeric(30);
+       // String token = RandomStringUtils.randomAlphanumeric(30);
         MacAlgorithm alg = Jwts.SIG.HS256; // HS256 algo added for JWT
         SecretKey key = alg.key().build(); // generating the secret key
 
@@ -104,8 +107,10 @@ public class AuthService {
     public UserDto signUp(String email, String password) {
         User user = new User();
         user.setEmail(email);
-        user.setPassword(bCryptPasswordEncoder.encode(password));
+        user.setPassword(password);
+
         User savedUser = userRepository.save(user);
+
         return UserDto.from(savedUser);
     }
 

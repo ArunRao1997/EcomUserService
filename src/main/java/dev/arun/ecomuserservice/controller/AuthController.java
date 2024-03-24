@@ -4,22 +4,18 @@ import dev.arun.ecomuserservice.dto.LoginRequestDto;
 import dev.arun.ecomuserservice.dto.SignUpRequestDto;
 import dev.arun.ecomuserservice.dto.UserDto;
 import dev.arun.ecomuserservice.dto.ValidateTokenRequestDto;
-import dev.arun.ecomuserservice.models.Session;
 import dev.arun.ecomuserservice.models.SessionStatus;
-import dev.arun.ecomuserservice.models.User;
 import dev.arun.ecomuserservice.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/auth")
-public class Authocontroller {
+public class AuthController {
     private AuthService authService;
 
-    public Authocontroller(AuthService authService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
@@ -47,13 +43,13 @@ public class Authocontroller {
     }
 
     // The below APIs are only for learning purposes, should not be present in actual systems
-    @GetMapping("/session")
-    public ResponseEntity<List<Session>> getAllSession(){
-        return authService.getAllSession();
-    }
-
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers(){
-        return authService.getAllUsers();
-    }
+//    @GetMapping("/session")
+//    public ResponseEntity<List<Session>> getAllSession(){
+//        return authService.getAllSession();
+//    }
+//
+//    @GetMapping("/users")
+//    public ResponseEntity<List<User>> getAllUsers(){
+//        return authService.getAllUsers();
+//    }
 }

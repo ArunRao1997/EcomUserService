@@ -12,9 +12,10 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    public Role createRole(String name){
+    public Role createRole(String name) {
         Role role = new Role();
         role.setRole(name);
+
         return roleRepository.save(role);
     }
 }
