@@ -1,5 +1,10 @@
 package dev.arun.ecomuserservice.service;//package dev.arun.ecomuserservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+//import dev.arun.ecomuserservice.clients.KafkaProducerClient;
+import dev.arun.ecomuserservice.clients.KafkaProducerClient;
+import dev.arun.ecomuserservice.dto.SendEmailMessageDto;
 import dev.arun.ecomuserservice.dto.UserDto;
 import dev.arun.ecomuserservice.exception.InvalidCredentialException;
 import dev.arun.ecomuserservice.exception.InvalidSessionException;
@@ -31,12 +36,21 @@ public class AuthService {
     private SessionRepository sessionRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     //private SecretKey secretKey;
+    private KafkaProducerClient kafkaProducerClient;
 
-    public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    private EmailService emailService;
+    private ObjectMapper objectMapper;
+
+        public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder, KafkaProducerClient kafkaProducerClient, EmailService emailService, ObjectMapper objectMapper) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.kafkaProducerClient = kafkaProducerClient;
+        this.emailService = emailService;
+        this.objectMapper = objectMapper;
     }
+
+
 
     public ResponseEntity<List<Session>> getAllSession() {
         List<Session> sessions = sessionRepository.findAll();
@@ -104,15 +118,43 @@ public class AuthService {
         return ResponseEntity.ok().build();
     }
 
-    public UserDto signUp(String email, String password) {
+    public UserDto signUp(String email, String password) throws JsonProcessingException {
         User user = new User();
         user.setEmail(email);
         user.setPassword(bCryptPasswordEncoder.encode(password));
 
         User savedUser = userRepository.save(user);
 
-        return UserDto.from(savedUser);
+        UserDto userDto = UserDto.from(savedUser);
+
+        kafkaProducerClient.sendMessage("userSignUp", objectMapper.writeValueAsString(userDto));
+        SendEmailMessageDto emailMessage = new SendEmailMessageDto();
+        emailMessage.setTo(userDto.getEmail());
+        emailMessage.setFrom("rao.nayinenii@gmail.com");
+        emailMessage.setSubject("Welcome to EcomUserService");
+        emailMessage.setBody("Thanks for creating an account. We look forward to you growing. Team Ecom");
+        kafkaProducerClient.sendMessage("sendEmail",objectMapper.writeValueAsString(emailMessage));
+        return userDto;
     }
+
+    /*public UserDto signUp(String email, String password) throws JsonProcessingException {
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+
+        User savedUser = userRepository.save(user);
+
+        UserDto userDto = UserDto.from(savedUser);
+        // Send the email directly
+        SendEmailMessageDto emailMessage = new SendEmailMessageDto();
+        emailMessage.setTo(userDto.getEmail());
+        emailMessage.setFrom("rao.nayinenii@gmail.com");
+        emailMessage.setSubject("Welcome to EcomUserService");
+        emailMessage.setBody("Thanks for creating an account. We look forward to you growing. Team Ecom");
+        emailService.sendEmail(emailMessage); // Use your injected emailService
+
+        return userDto;
+    }*/
 
     public SessionStatus validate(String token, Long userId) {
         //TODO check expiry // Jwts Parser -> parse the encoded JWT token to read the claims

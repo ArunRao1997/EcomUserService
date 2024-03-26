@@ -1,5 +1,6 @@
 package dev.arun.ecomuserservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.arun.ecomuserservice.dto.LoginRequestDto;
 import dev.arun.ecomuserservice.dto.SignUpRequestDto;
 import dev.arun.ecomuserservice.dto.UserDto;
@@ -34,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDto> signUp(@RequestBody SignUpRequestDto request) {
+    public ResponseEntity<UserDto> signUp(@RequestBody SignUpRequestDto request) throws JsonProcessingException {
         UserDto userDto = authService.signUp(request.getEmail(), request.getPassword());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
