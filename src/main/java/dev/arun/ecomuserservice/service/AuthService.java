@@ -127,13 +127,13 @@ public class AuthService {
 
         UserDto userDto = UserDto.from(savedUser);
 
-        kafkaProducerClient.sendMessage("userSignUp", objectMapper.writeValueAsString(userDto));
-        SendEmailMessageDto emailMessage = new SendEmailMessageDto();
-        emailMessage.setTo(userDto.getEmail());
-        emailMessage.setFrom("rao.nayinenii@gmail.com");
-        emailMessage.setSubject("Welcome to EcomUserService");
-        emailMessage.setBody("Thanks for creating an account. We look forward to you growing. Team Ecom");
-        kafkaProducerClient.sendMessage("sendEmail",objectMapper.writeValueAsString(emailMessage));
+//        kafkaProducerClient.sendMessage("userSignUp", objectMapper.writeValueAsString(userDto));
+//        SendEmailMessageDto emailMessage = new SendEmailMessageDto();
+//        emailMessage.setTo(userDto.getEmail());
+//        emailMessage.setFrom("rao.nayinenii@gmail.com");
+//        emailMessage.setSubject("Welcome to EcomUserService");
+//        emailMessage.setBody("Thanks for creating an account. We look forward to you growing. Team Ecom");
+//        kafkaProducerClient.sendMessage("sendEmail",objectMapper.writeValueAsString(emailMessage));
         return userDto;
     }
 

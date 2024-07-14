@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IX_pk_authorizationconsent ON authorization_consent (registered_client_id, principal_name);

@@ -3,7 +3,8 @@ package dev.arun.ecomuserservice.security.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.arun.ecomuserservice.security.model.Client;
+
+import dev.arun.ecomuserservice.security.model.Client1;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -54,7 +55,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         return this.clientRepository.findByClientId(clientId).map(this::toObject).orElse(null);
     }
 
-    private RegisteredClient toObject(Client client) {
+    private RegisteredClient toObject(Client1 client) {
         Set<String> clientAuthenticationMethods = StringUtils.commaDelimitedListToSet(
                 client.getClientAuthenticationMethods());
         Set<String> authorizationGrantTypes = StringUtils.commaDelimitedListToSet(
@@ -91,7 +92,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         return builder.build();
     }
 
-    private Client toEntity(RegisteredClient registeredClient) {
+    private Client1 toEntity(RegisteredClient registeredClient) {
         List<String> clientAuthenticationMethods = new ArrayList<>(registeredClient.getClientAuthenticationMethods().size());
         registeredClient.getClientAuthenticationMethods().forEach(clientAuthenticationMethod ->
                 clientAuthenticationMethods.add(clientAuthenticationMethod.getValue()));
@@ -100,7 +101,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         registeredClient.getAuthorizationGrantTypes().forEach(authorizationGrantType ->
                 authorizationGrantTypes.add(authorizationGrantType.getValue()));
 
-        Client entity = new Client();
+        Client1 entity = new Client1();
         entity.setId(registeredClient.getId());
         entity.setClientId(registeredClient.getClientId());
         entity.setClientIdIssuedAt(registeredClient.getClientIdIssuedAt());

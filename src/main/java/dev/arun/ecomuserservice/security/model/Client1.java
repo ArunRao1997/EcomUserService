@@ -1,4 +1,5 @@
 package dev.arun.ecomuserservice.security.model;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +13,7 @@ import java.time.Instant;
 @Table(name = "`client`")
 @Getter
 @Setter
-public class Client {
+public class Client1 {
     @Id
     private String id;
     private String clientId;
