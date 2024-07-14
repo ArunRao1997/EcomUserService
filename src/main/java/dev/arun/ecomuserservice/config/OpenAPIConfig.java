@@ -13,8 +13,8 @@ public class OpenAPIConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Spring Boot 3 API")
+                        .title("EcomUserService")
                         .version("1.0")
-                        .description("This is a sample Spring Boot 3 application with Swagger UI"));
+                        .description("EcomUserService"));
     }
 }
